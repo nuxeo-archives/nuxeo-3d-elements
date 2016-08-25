@@ -15,14 +15,14 @@ limitations under the License.
 Contributors:
 Tiago Cardoso <tcardoso@nuxeo.com>
 -->
-<link rel="import" href="../polymer/polymer.html">
-<script src="../three.js/build/three.js"></script>
-<script src="../three.js/examples/js/controls/OrbitControls.js"></script>
-<script src="../three.js/examples/js/loaders/gltf/glTF-parser.js"></script>
-<script src="../three.js/examples/js/loaders/gltf/glTFLoader.js"></script>
-<script src="../three.js/examples/js/loaders/gltf/glTFLoaderUtils.js"></script>
-<script src="../three.js/examples/js/loaders/gltf/glTFAnimation.js"></script>
-<script src="../three.js/examples/js/loaders/gltf/glTFShaders.js"></script>
+<link rel="import" href="bower_components/polymer/polymer.html">
+<script src="bower_components/three.js/build/three.js"></script>
+<script src="bower_components/three.js/examples/js/controls/OrbitControls.js"></script>
+<script src="bower_components/three.js/examples/js/loaders/gltf/glTF-parser.js"></script>
+<script src="bower_components/three.js/examples/js/loaders/gltf/glTFLoader.js"></script>
+<script src="bower_components/three.js/examples/js/loaders/gltf/glTFLoaderUtils.js"></script>
+<script src="bower_components/three.js/examples/js/loaders/gltf/glTFAnimation.js"></script>
+<script src="bower_components/three.js/examples/js/loaders/gltf/glTFShaders.js"></script>
 
 <!--
 An element for viewing 3D content.
@@ -131,8 +131,6 @@ Polymer({
   _setupCameras: function() {
     this.cameras = {};
     this.camera = new THREE.PerspectiveCamera(25, 0.5 , 0.001, 2000);
-    this.camera.position.set(10, 10, 10);
-
     this.root.add(this.camera);
   },
 
@@ -185,6 +183,18 @@ Polymer({
   _render: function() {
     this.resize();
     this.renderer.render(this.root, this.camera);
+  },
+
+  setCameraFromAngles: function(azimuthDegrees, zenithDegrees) {
+    this.controls.reset();
+    var azimuth = azimuthDegrees * (Math.PI / 180);
+    var zenith = zenithDegrees * (Math.PI / 180);
+    var radius = this.cameraDistance;
+    this.camera.position.set(
+            radius * Math.sin(azimuth) * Math.sin(zenith),
+            radius * Math.cos(zenith),
+            radius * Math.cos(azimuth) * Math.sin(zenith)
+    );
   },
 
   test: function(e) {
@@ -267,6 +277,7 @@ Polymer({
   _cameraComposition: function(camera) {
     this.camera.position.copy(new THREE.Vector3(2.5, 1.75, 2.2));
     this.camera.fov = 25;
+    this.cameraDistance = this.camera.position.distanceTo(this.root.position);
   }
 
 });
