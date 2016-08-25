@@ -15,14 +15,15 @@ limitations under the License.
 Contributors:
 Tiago Cardoso <tcardoso@nuxeo.com>
 -->
-<link rel="import" href="bower_components/polymer/polymer.html">
-<script src="bower_components/three.js/build/three.js"></script>
-<script src="bower_components/three.js/examples/js/controls/OrbitControls.js"></script>
-<script src="bower_components/three.js/examples/js/loaders/gltf/glTF-parser.js"></script>
-<script src="bower_components/three.js/examples/js/loaders/gltf/glTFLoader.js"></script>
-<script src="bower_components/three.js/examples/js/loaders/gltf/glTFLoaderUtils.js"></script>
-<script src="bower_components/three.js/examples/js/loaders/gltf/glTFAnimation.js"></script>
-<script src="bower_components/three.js/examples/js/loaders/gltf/glTFShaders.js"></script>
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<script src="../three.js/build/three.js"></script>
+<script src="../three.js/examples/js/controls/OrbitControls.js"></script>
+<script src="../three.js/examples/js/loaders/GLTFLoader.js"></script>
+<script src="../three.js/examples/js/loaders/GLTFLoader.js"></script>
+
 
 <!--
 An element for viewing 3D content.
@@ -60,6 +61,10 @@ Polymer({
 
   is: 'nuxeo-3d-viewer',
 
+  behaviors: [
+    Polymer.IronResizableBehavior
+  ],
+
   properties: {
 
     /**
@@ -76,6 +81,10 @@ Polymer({
     sources: Object
   },
 
+  listeners: {
+      'iron-resize': '_resize'
+  },
+
   ready: function() {
     this.$.threed.width = this.width;
     this.$.threed.height = this.height;
@@ -87,7 +96,7 @@ Polymer({
     }.bind(this));
     this._setup();
     this.load();
-
+    this.async(this.notifyResize, 1);
   },
 
   load: function() {
@@ -95,15 +104,26 @@ Polymer({
       return;
     }
     var source = this.sources[0];
+    /*
     var loader = new THREE.glTFLoader();
+    var gltf = loader.par
     return new Promise((resolve, reject) => {
       loader.load(source.src, (data) => {
         this._processLoad(data);
-        this._animate();
+        this._resize();
+        this._render();
         resolve();
       });
     });
-
+    */
+    var loader = new THREE.GLTFLoader();
+    var onLoad = function(gltf) {
+      this._processLoad(gltf);
+      this._resize();
+      this.controls.update();
+      this._render();
+    }.bind(this);
+    loader.load(source.src, onLoad)
   },
 
   _setup: function() {
@@ -164,10 +184,10 @@ Polymer({
 
   _setupControls: function() {
     this.controls = new THREE.OrbitControls(this.camera, this.$.threed);
-    this.controls.addEventListener('change', this.test.bind(this));
+    this.controls.addEventListener('change', this._render.bind(this));
   },
 
-  resize: function() {
+  _resize: function() {
     this.camera.aspect = this.$.threed.offsetWidth / this.$.threed.offsetHeight;
     this.camera.updateProjectionMatrix();
 
@@ -178,10 +198,10 @@ Polymer({
     }
 
     this.renderer.setSize(this.$.threed.clientWidth, this.$.threed.clientHeight);
+    this._render();
   },
 
   _render: function() {
-    this.resize();
     this.renderer.render(this.root, this.camera);
   },
 
@@ -195,11 +215,6 @@ Polymer({
             radius * Math.cos(zenith),
             radius * Math.sin(azimuth) * Math.sin(zenith)
     );
-  },
-
-  test: function(e) {
-    console.log(e.target.getPolarAngle());
-    console.log(this.camera.position);
   },
 
   _animate: function() {
@@ -250,25 +265,21 @@ Polymer({
     matrix.makeTranslation(center.x, center.y, center.z);
     matrix.multiplyScalar(scale);
     object.applyMatrix(matrix);
-    object.castShadow = true;
-    if(object.geometry) {
-      object.geometry.computeFaceNormals();
-      object.geometry.computeVertexNormals();
-      object.geometry.computeBoundingSphere();
-      object.geometry.elementsNeedUpdate = true;
-      object.geometry.verticesNeedUpdate = true;
-      object.geometry.normalsNeedUpdate = true;
-    }
-    object.traverse(function (child) {
-      child.castShadow = true;
-      if(child.geometry) {
-        child.geometry.computeFaceNormals();
-        child.geometry.computeVertexNormals();
-        child.geometry.computeBoundingSphere();
-        child.geometry.elementsNeedUpdate = true;
-        child.geometry.verticesNeedUpdate = true;
-        child.geometry.normalsNeedUpdate = true;
+
+    var prepare = function(object, hasShadow) {
+      if(object.geometry) {
+        object.castShadow = hasShadow;
+        object.geometry.computeFaceNormals();
+        object.geometry.computeVertexNormals();
+        object.geometry.computeBoundingSphere();
+        object.geometry.elementsNeedUpdate = true;
+        object.geometry.verticesNeedUpdate = true;
+        object.geometry.normalsNeedUpdate = true;
       }
+    }
+    prepare(object, true);
+    object.traverse(function (child) {
+      prepare(child, true);
     });
   },
 
