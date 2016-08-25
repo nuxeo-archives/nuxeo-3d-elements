@@ -191,9 +191,9 @@ Polymer({
     var zenith = zenithDegrees * (Math.PI / 180);
     var radius = this.cameraDistance;
     this.camera.position.set(
-            radius * Math.sin(azimuth) * Math.sin(zenith),
+            -radius * Math.cos(azimuth) * Math.sin(zenith),
             radius * Math.cos(zenith),
-            radius * Math.cos(azimuth) * Math.sin(zenith)
+            radius * Math.sin(azimuth) * Math.sin(zenith)
     );
   },
 
@@ -235,9 +235,7 @@ Polymer({
 
   _objectComposition: function(object) {
     var rotObjectMatrix = new THREE.Matrix4();
-    rotObjectMatrix.makeRotationAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
-    object.matrix.multiply(rotObjectMatrix);
-    rotObjectMatrix.makeRotationAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+    rotObjectMatrix.makeRotationAxis(new THREE.Vector3(0, 1, 0), Math.PI);
     object.matrix.multiply(rotObjectMatrix);
     object.rotation.setFromRotationMatrix(object.matrix);
 
