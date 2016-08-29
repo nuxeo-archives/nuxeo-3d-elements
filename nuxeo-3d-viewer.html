@@ -104,6 +104,7 @@ Polymer({
   },
 
   load: function() {
+    this.clear();
     var loader = new THREE.GLTFLoader();
     if( this.loader == 'complete') {
       loader = new THREE.glTFLoader();
@@ -116,6 +117,21 @@ Polymer({
     }.bind(this);
     loader.load(this.src, onLoad);
 
+  },
+
+  clear: function() {
+    if (this.scene) {
+      var objects = this.scene.children;
+      while ( objects.length > 0 ) {
+        this._removeObject( objects[ 0 ] );
+      }
+    }
+
+  },
+
+  _removeObject: function ( object ) {
+    if ( object.parent === null ) return; // avoid deleting the camera or scene
+    object.parent.remove( object );
   },
 
   _sourceChanged: function() {
