@@ -22,8 +22,11 @@ Tiago Cardoso <tcardoso@nuxeo.com>
 <script src="../three.js/build/three.js"></script>
 <script src="../three.js/examples/js/controls/OrbitControls.js"></script>
 <script src="../three.js/examples/js/loaders/GLTFLoader.js"></script>
-<script src="../three.js/examples/js/loaders/GLTFLoader.js"></script>
-
+<script src="../three.js/examples/js/loaders/gltf/glTF-parser.js"></script>
+<script src="../three.js/examples/js/loaders/gltf/glTFLoader.js"></script>
+<script src="../three.js/examples/js/loaders/gltf/glTFLoaderUtils.js"></script>
+<script src="../three.js/examples/js/loaders/gltf/glTFAnimation.js"></script>
+<script src="../three.js/examples/js/loaders/gltf/glTFShaders.js"></script>
 
 <!--
 An element for viewing 3D content.
@@ -68,62 +71,55 @@ Polymer({
   properties: {
 
     /**
-    * The `preload` attribute specifies if/how the 3D should be loaded.
+    * The `loader` attribute specifies type of loader.
+    * 'simple' : no shaders, annimations, etc. fast and simple.
+    * 'complete' : complete loader. full feature and slower.
     */
-    preload: {
+    loader: {
       type: String,
-      value: 'auto'
+      value: 'simple'
     },
 
     /**
-    * The `sources` to be displayed.
+    * The `src` to be displayed.
     */
-    sources: Object
+    src: {
+      type: String,
+      observer: '_sourceChanged'
+    }
   },
 
   listeners: {
-      'iron-resize': '_resize'
+    'iron-resize': '_resize'
   },
 
   ready: function() {
     this.$.threed.width = this.width;
     this.$.threed.height = this.height;
-    this.sources = Polymer.dom(this).children.map(function(source) {
-      return {
-        src : source.getAttribute('src'),
-        lod : source.getAttribute('lod') + 0
-      }
-    }.bind(this));
     this._setup();
-    this.load();
+    if( this.src ) {
+      this.load();
+    }
     this.async(this.notifyResize, 1);
   },
 
   load: function() {
-    if(this.sources.length == 0) {
-      return;
-    }
-    var source = this.sources[0];
-    /*
-    var loader = new THREE.glTFLoader();
-    var gltf = loader.par
-    return new Promise((resolve, reject) => {
-      loader.load(source.src, (data) => {
-        this._processLoad(data);
-        this._resize();
-        this._render();
-        resolve();
-      });
-    });
-    */
     var loader = new THREE.GLTFLoader();
+    if( this.loader == 'complete') {
+      loader = new THREE.glTFLoader();
+    }
     var onLoad = function(gltf) {
       this._processLoad(gltf);
       this._resize();
       this.controls.update();
       this._render();
     }.bind(this);
-    loader.load(source.src, onLoad)
+    loader.load(this.src, onLoad);
+
+  },
+
+  _sourceChanged: function() {
+    this.load();
   },
 
   _setup: function() {
@@ -202,6 +198,9 @@ Polymer({
   },
 
   _render: function() {
+    if (this.loader == 'complete') {
+      THREE.glTFShaders.update(this.scene, this.camera);
+    }
     this.renderer.render(this.root, this.camera);
   },
 
@@ -211,9 +210,9 @@ Polymer({
     var zenith = zenithDegrees * (Math.PI / 180);
     var radius = this.cameraDistance;
     this.camera.position.set(
-            -radius * Math.cos(azimuth) * Math.sin(zenith),
-            radius * Math.cos(zenith),
-            radius * Math.sin(azimuth) * Math.sin(zenith)
+      -radius * Math.cos(azimuth) * Math.sin(zenith),
+      radius * Math.cos(zenith),
+      radius * Math.sin(azimuth) * Math.sin(zenith)
     );
   },
 

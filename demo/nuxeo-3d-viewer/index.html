@@ -29,11 +29,18 @@ Contributors:
       width: 100%;
       height: 450px;
     }
+    #viewerComplete {
+      width: 100%;
+      height: 450px;
+    }
   </style>
   <body unresolved>
-    <nuxeo-3d-viewer id="viewer">
-      <source src="suzanne.gltf" lod='100' />
+    <h1>Simple</h1>
+    <nuxeo-3d-viewer src="suzanne.gltf" id="viewer">
     </nuxeo-3d-viewer>
-    <pre>(c) copyright 2008, Blender Foundation</pre>
+    <h1>Complete</h1>
+    <nuxeo-3d-viewer src="suzanne.gltf" id="viewerComplete" loader="complete">
+    </nuxeo-3d-viewer>
+    <pre>(c) Suzanne model copyright 2008, Blender Foundation</pre>
   </body>
 </html>
