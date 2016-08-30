@@ -29,9 +29,18 @@ Tiago Cardoso <tcardoso@nuxeo.com>
 <script src="../three.js/examples/js/loaders/gltf/glTFShaders.js"></script>
 
 <!--
-An element for viewing 3D content.
-Example:
-<nuxeo-3d-viewer sources="[[sources]]" controls preload="auto" width="640" height="264"></nuxeo-3d-viewer>
+`nuxeo-3d-viewer` allows viewing 3D content in glTF format.
+
+    <nuxeo-3d-viewer></nuxeo-3d-viewer>
+
+Example - Load a source with a simple loader. Quicker and faster
+
+    <nuxeo-3d-viewer src="[[source]]"></nuxeo-3d-viewer>
+
+Example - Load a source with complete loader. Loads animations, shaders and all 3D assets from glTF.
+
+    <nuxeo-3d-viewer src="[[source]]" loader="complete"></nuxeo-3d-viewer>
+
 @group Nuxeo 3D Elements
 @element nuxeo-3d-viewer
 @demo demo/nuxeo-3d-viewer/index.html
@@ -102,6 +111,16 @@ Polymer({
       notify: true,
       reflectToAttribute: true,
       observer: '_sphericalCoordsChanged'
+    },
+
+    /**
+    * The `setupFinished' to indicate if setup process is finished
+    */
+    setupFinished : {
+      type: Boolean,
+      readOnly: true,
+      value: false,
+      notify: true
     }
   },
 
@@ -110,6 +129,7 @@ Polymer({
   },
 
   ready: function() {
+    this._setupDone = false;
     this.$.threed.width = this.width;
     this.$.threed.height = this.height;
     this._setup();
@@ -170,6 +190,7 @@ Polymer({
     this._setupLights();
     this._setupRenderer();
     this._setupControls();
+    this._setSetupFinished(true);
   },
 
   _setupScene: function() {

@@ -25,6 +25,7 @@ Tiago Cardoso <tcardoso@nuxeo.com>
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="../../web-component-tester/browser.js"></script>
 
+  <script src="test-helpers.js"></script>
   <link rel="import" href="../../polymer/polymer.html">
   <link rel="import" href="../nuxeo-3d-viewer.html">
 </head>
@@ -61,11 +62,19 @@ Tiago Cardoso <tcardoso@nuxeo.com>
         expect(simple3DViewerEl.renderer).to.not.be.null;
         var threedEl = simple3DViewerEl.$.threed;
         expect(threedEl).to.not.be.null;
-        var children = threedEl.children;
-        expect(children).to.have.length(1);
-        canvas = children[0];
-        expect(canvas.nodeName).to.be.equal('CANVAS');
-        expect(canvas.getContext("webgl")).to.not.be.null;
+        var canvasTest = function() {
+          var children = threedEl.children;
+          expect(children).to.have.length(1);
+          canvas = children[0];
+          expect(canvas.nodeName).to.be.equal('CANVAS');
+          expect(canvas.getContext("webgl")).to.not.be.null;
+        }
+        if(simple3DViewerEl.setupFinished) {
+          canvasTest();
+        } else {
+          return waitChanged(simple3DViewerEl, 'setup-finished').then(canvasTest);
+        }
+
       });
       test('has renderer', function() {
         expect(simple3DViewerEl.renderer).to.not.be.null;
