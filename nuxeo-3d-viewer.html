@@ -86,6 +86,17 @@ Polymer({
     src: {
       type: String,
       observer: '_sourceChanged'
+    },
+
+    /**
+     * The `sphericalCoords` to be set externally.
+     */
+    sphericalCoords: {
+      type: Array,
+      value: [0, 0],
+      notify: true,
+      reflectToAttribute: true,
+      observer: '_sphericalCoordsChanged'
     }
   },
 
@@ -136,6 +147,10 @@ Polymer({
 
   _sourceChanged: function() {
     this.load();
+  },
+
+  _sphericalCoordsChanged: function() {
+    this.setCameraFromAngles(this.sphericalCoords[0], this.sphericalCoords[1]);
   },
 
   _setup: function() {
@@ -196,7 +211,11 @@ Polymer({
 
   _setupControls: function() {
     this.controls = new THREE.OrbitControls(this.camera, this.$.threed);
-    this.controls.addEventListener('change', this._render.bind(this));
+    this.controls.addEventListener('change', this._controlsUpdated.bind(this));
+  },
+
+  _controlsUpdated: function() {
+    this._render();
   },
 
   _resize: function() {
@@ -221,15 +240,20 @@ Polymer({
   },
 
   setCameraFromAngles: function(azimuthDegrees, zenithDegrees) {
+    if (!this.controls) {
+      return;
+    }
     this.controls.reset();
-    var azimuth = azimuthDegrees * (Math.PI / 180);
-    var zenith = zenithDegrees * (Math.PI / 180);
+    var azimuth = (azimuthDegrees % 360) * (Math.PI / 180);
+    // edge case in the top pole of the sphere (zenith = 0)
+    var zenith = ((zenithDegrees % 360) == 0) ? 1.0E-15 : (zenithDegrees % 360) * (Math.PI / 180);
     var radius = this.cameraDistance;
     this.camera.position.set(
       -radius * Math.cos(azimuth) * Math.sin(zenith),
       radius * Math.cos(zenith),
       radius * Math.sin(azimuth) * Math.sin(zenith)
     );
+    this.controls.update();
   },
 
   _animate: function() {
@@ -299,9 +323,9 @@ Polymer({
   },
 
   _cameraComposition: function(camera) {
-    this.camera.position.copy(new THREE.Vector3(2.5, 1.75, 2.2));
+    this.sphericalCoords = [225, 45];
     this.camera.fov = 25;
-    this.cameraDistance = this.camera.position.distanceTo(this.root.position);
+    this.cameraDistance = 4;
   }
 
 });
