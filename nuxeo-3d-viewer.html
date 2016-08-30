@@ -52,6 +52,10 @@ Example:
     @apply(--layout-flex);
   }
 
+  #threed>canvas {
+    display: block;
+  }
+
   </style>
   <div id="threed">
   </div>
@@ -77,7 +81,8 @@ Polymer({
     */
     loader: {
       type: String,
-      value: 'simple'
+      value: 'simple',
+      observer: '_loaderChanged'
     },
 
     /**
@@ -108,6 +113,7 @@ Polymer({
     this.$.threed.width = this.width;
     this.$.threed.height = this.height;
     this._setup();
+    this._loaderChanged();
     if( this.src ) {
       this.load();
     }
@@ -116,17 +122,14 @@ Polymer({
 
   load: function() {
     this.clear();
-    var loader = new THREE.GLTFLoader();
-    if( this.loader == 'complete') {
-      loader = new THREE.glTFLoader();
-    }
+
     var onLoad = function(gltf) {
       this._processLoad(gltf);
       this._resize();
       this.controls.update();
       this._render();
     }.bind(this);
-    loader.load(this.src, onLoad);
+    this.gltfLoader.load(this.src, onLoad);
 
   },
 
@@ -138,6 +141,14 @@ Polymer({
       }
     }
 
+  },
+
+  _loaderChanged: function () {
+    if( this.loader == 'complete') {
+      this.gltfLoader = new THREE.glTFLoader();
+    } else {
+      this.gltfLoader = new THREE.GLTFLoader();
+    }
   },
 
   _removeObject: function ( object ) {
