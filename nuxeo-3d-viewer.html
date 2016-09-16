@@ -124,7 +124,8 @@ Polymer({
   },
 
   listeners: {
-    'iron-resize': '_resize'
+    'iron-resize': '_resize',
+    'on-setup-finished': '_resize'
   },
 
   ready: function() {
@@ -250,17 +251,19 @@ Polymer({
   },
 
   _resize: function() {
-    this.camera.aspect = this.$.threed.offsetWidth / this.$.threed.offsetHeight;
-    this.camera.updateProjectionMatrix();
+    if (this.setupFinished) {
+      this.camera.aspect = this.$.threed.offsetWidth / this.$.threed.offsetHeight;
+      this.camera.updateProjectionMatrix();
 
-    var i, len = this.cameras.length;
-    for (i = 0; i < len; i++) {
-      this.cameras[i].aspect = this.$.threed.offsetWidth / this.$.threed.offsetHeight;
-      this.cameras[i].updateProjectionMatrix();
+      var i, len = this.cameras.length;
+      for (i = 0; i < len; i++) {
+        this.cameras[i].aspect = this.$.threed.offsetWidth / this.$.threed.offsetHeight;
+        this.cameras[i].updateProjectionMatrix();
+      }
+
+      this.renderer.setSize(this.$.threed.clientWidth, this.$.threed.clientHeight);
+      this._render();
     }
-
-    this.renderer.setSize(this.$.threed.clientWidth, this.$.threed.clientHeight);
-    this._render();
   },
 
   _render: function() {
