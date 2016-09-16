@@ -164,7 +164,7 @@ Polymer({
   },
 
   _loaderChanged: function () {
-    if( this.loader == 'complete') {
+    if (this.loader == 'complete') {
       this.gltfLoader = new THREE.glTFLoader();
     } else {
       this.gltfLoader = new THREE.GLTFLoader();
@@ -177,7 +177,9 @@ Polymer({
   },
 
   _sourceChanged: function() {
-    this.load();
+    if (this.setupFinished) {
+      this.load();
+    }
   },
 
   _sphericalCoordsChanged: function() {
