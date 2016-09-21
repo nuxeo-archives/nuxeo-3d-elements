@@ -335,7 +335,7 @@ Polymer({
     var dists = new THREE.Vector3().copy(box3.max).sub(box3.min);
     var maxSize = Math.max.apply(null, [dists.x, dists.y, dists.z]);
     var scale = 1 / maxSize;
-    var center = new THREE.Vector3().sub(box3.center());
+    var center = new THREE.Vector3().sub(box3.getCenter());
     var matrix = new THREE.Matrix4().identity();
     matrix.makeTranslation(center.x, center.y, center.z);
     matrix.multiplyScalar(scale);
