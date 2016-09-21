@@ -125,7 +125,7 @@ Polymer({
 
   listeners: {
     'iron-resize': '_resize',
-    'on-setup-finished': '_resize'
+    'on-setup-finished': 'load'
   },
 
   ready: function() {
@@ -134,9 +134,7 @@ Polymer({
     this.$.threed.height = this.height;
     this._setup();
     this._loaderChanged();
-    if( this.src ) {
-      this.load();
-    }
+    this.load();
     this.async(this.notifyResize, 1);
   },
 
@@ -146,11 +144,12 @@ Polymer({
     var onLoad = function(gltf) {
       this._processLoad(gltf);
       this._resize();
-      this.controls.update();
+      //this.zupdate();
       this._render();
     }.bind(this);
-    this.gltfLoader.load(this.src, onLoad);
-
+    if (this.src) {
+      this.gltfLoader.load(this.src, onLoad);
+    }
   },
 
   clear: function() {
@@ -177,9 +176,7 @@ Polymer({
   },
 
   _sourceChanged: function() {
-    if (this.setupFinished) {
       this.load();
-    }
   },
 
   _sphericalCoordsChanged: function() {
