@@ -339,7 +339,7 @@ Polymer({
     object.applyMatrix(matrix);
 
     var prepare = function(object, hasShadow) {
-      if(object.geometry) {
+      if (object.geometry) {
         object.castShadow = hasShadow;
         object.geometry.computeFaceNormals();
         object.geometry.computeVertexNormals();
@@ -348,6 +348,10 @@ Polymer({
         object.geometry.verticesNeedUpdate = true;
         object.geometry.normalsNeedUpdate = true;
       }
+      if (object.material && object.material.bumpMap) {
+        object.material.bumpScale = scale;
+      }
+
     }
     prepare(object, true);
     object.traverse(function (child) {
