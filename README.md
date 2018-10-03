@@ -1,4 +1,5 @@
 [![Build Status](https://qa.nuxeo.org/jenkins/buildStatus/icon?job=master/nuxeo-3d-elements-master)](https://qa.nuxeo.org/jenkins/job/master/job/nuxeo-3d-elements-master/)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8bc5719c04f74732b60d09c24742ef85)](https://www.codacy.com/app/Nuxeo/nuxeo-3d-elements)
 
 # About nuxeo-3d-elements
 
