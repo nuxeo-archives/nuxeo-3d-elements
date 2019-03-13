@@ -1,0 +1,6 @@
+While performing addons migration to WebUI (please see JIRA NXP-26830 for further details) we noticed that this project was moved to nuxeo-platform-3d under e8f0960fecbfd21ac5718fff3bd0699ae7d65f19 commit.
+For this reason, and since this repository is not maintained anymore we decided to deprecate it.
+
+From now on nuxeo-3d-elements can be found on the following locations:
+- https://github.com/nuxeo/nuxeo-web-ui/tree/master/addons/nuxeo-platform-3d/elements (Master Version)
+- https://github.com/nuxeo/nuxeo-platform-3d/tree/master/nuxeo-platform-3d-elements (10.10, 9.10 and 8.10)
